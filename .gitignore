@@ -1,0 +1,42 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Node dependencies and build artifacts
+node_modules/
+backend/node_modules/
+backend/dist/
+.vercel/
+backend/.vercel/
+
+# Uploaded user files
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Flutter / Dart build & tools
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# IDE / Editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Logs, dumps & temporary files
+*.log
+.DS_Store
+*.class
+*.pyc
+*.swp
+.atom/
+.buildlog/
+.history
+tree*.txt

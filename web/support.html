@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Support Center - Elite Academy</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary": "#ffffff",
+                        "primary": "#000000",
+                        "on-surface-variant": "#45464d",
+                        "primary-fixed": "#dae2fd",
+                        "primary-container": "#131b2e",
+                        "on-primary-container": "#7c839b",
+                        "on-secondary-fixed-variant": "#763300",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed": "#331200",
+                        "secondary-fixed-dim": "#ffb68e",
+                        "tertiary-fixed": "#d5e3fd",
+                        "secondary-fixed": "#ffdbca",
+                        "surface-container-high": "#e6e8ea",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#565e74",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "inverse-primary": "#bec6e0",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#000000",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed": "#0d1c2f",
+                        "on-primary-fixed": "#131b2e",
+                        "secondary": "#9b4500",
+                        "on-secondary-container": "#682c00",
+                        "on-tertiary-fixed-variant": "#3a485c",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-container": "#76859b",
+                        "background": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-container": "#fd8a42",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#0d1c2f",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "outline-variant": "#c6c6cd",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#b9c7e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex antialiased">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden bg-surface-bright text-primary border-b border-outline-variant flex justify-between items-center w-full px-margin-mobile h-16 z-40 fixed top-0">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80">menu</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">Elite Academy</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<!-- SideNavBar (Web Only) -->
+<nav class="hidden md:flex bg-surface-container-lowest text-primary border-r border-outline-variant fixed left-0 top-0 h-full w-64 flex-col py-6 z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-lg">EA</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Elite Academy</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Teacher Portal</p>
+</div>
+</div>
+<div class="flex-grow overflow-y-auto px-4">
+<ul class="space-y-2">
+<li class="flex items-center gap-4 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer group font-label-md text-label-md">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </li>
+<li class="flex items-center gap-4 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer group font-label-md text-label-md">
+<span class="material-symbols-outlined">group</span>
+                    My Students
+                </li>
+<li class="flex items-center gap-4 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer group font-label-md text-label-md">
+<span class="material-symbols-outlined">grade</span>
+                    Upload Results
+                </li>
+<li class="flex items-center gap-4 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer group font-label-md text-label-md">
+<span class="material-symbols-outlined">description</span>
+                    Upload Notes
+                </li>
+
+</ul>
+</div>
+<div class="px-4 mt-auto pt-6 border-t border-outline-variant mx-4">
+<ul class="space-y-2">
+<li class="flex items-center gap-4 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer group font-label-md text-label-md">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </li>
+<li class="flex items-center gap-4 px-4 py-3 rounded-DEFAULT text-primary font-bold border-l-4 border-secondary bg-surface-container-high transition-all cursor-pointer group font-label-md text-label-md">
+<span class="material-symbols-outlined icon-fill">help</span>
+                    Support
+                </li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 pt-20 md:pt-12 px-margin-mobile md:px-margin-desktop pb-24 max-w-container-max mx-auto w-full">
+<!-- Header -->
+<div class="mb-12 border-b border-outline-variant pb-6">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Support Center</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">How can we assist you today?</p>
+</div>
+<!-- Search Bar -->
+<div class="mb-12 max-w-3xl">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input id="faqSearchInput" onkeyup="filterFaqs()" class="w-full pl-12 pr-4 py-4 bg-surface-bright border border-outline-variant rounded-DEFAULT focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md transition-shadow" placeholder="Search for help articles, FAQs, or documentation..." type="text">
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- FAQ Section (Spans 8 columns) -->
+<div class="md:col-span-8 space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">forum</span>
+                    Frequently Asked Questions
+                </h3>
+<div id="faqContainer" class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT overflow-hidden">
+<!-- FAQ Item 1 -->
+<div class="faq-item border-b border-outline-variant last:border-b-0">
+<button class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-surface-container transition-colors focus:outline-none" onclick="toggleFaq(this)">
+<span class="font-label-md text-label-md text-primary faq-question">How do I correctly format the results CSV for upload?</span>
+<span class="material-symbols-outlined text-on-surface-variant faq-icon">expand_more</span>
+</button>
+<div class="faq-answer hidden px-6 pb-4 pt-2 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface-variant">
+                            The CSV file must contain columns for 'Student ID', 'Course Code', and 'Grade'. Ensure there are no empty rows and that 'Student ID' perfectly matches the registrar's database format. Download the template from the 'Upload Results' page.
+                        </div>
+</div>
+<!-- FAQ Item 2 -->
+<div class="faq-item border-b border-outline-variant last:border-b-0">
+<button class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-surface-container transition-colors focus:outline-none" onclick="toggleFaq(this)">
+<span class="font-label-md text-label-md text-primary faq-question">What is the file size limit for uploading lecture notes?</span>
+<span class="material-symbols-outlined text-on-surface-variant faq-icon">expand_more</span>
+</button>
+<div class="faq-answer hidden px-6 pb-4 pt-2 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface-variant">
+                            Lecture notes (PDF, PPTX, DOCX) must not exceed 50MB per file. For larger presentations containing video or high-res images, please provide a shared drive link in the class announcements instead.
+                        </div>
+</div>
+<!-- FAQ Item 3 -->
+<div class="faq-item border-b border-outline-variant last:border-b-0">
+<button class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-surface-container transition-colors focus:outline-none" onclick="toggleFaq(this)">
+<span class="font-label-md text-label-md text-primary faq-question">How can I view a student's past academic history?</span>
+<span class="material-symbols-outlined text-on-surface-variant faq-icon">expand_more</span>
+</button>
+<div class="faq-answer hidden px-6 pb-4 pt-2 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface-variant">
+                            Navigate to 'My Students', select the specific student, and click on the 'Academic Transcript' tab. This section is restricted and requires reverification of your faculty credentials.
+                        </div>
+</div>
+</div>
+</div>
+<!-- Sidebar Actions (Spans 4 columns) -->
+<div class="md:col-span-4 space-y-6">
+<!-- Contact Support Card -->
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT p-6 shadow-[0px_10px_30px_rgba(15,23,42,0.08)] relative overflow-hidden group">
+<div class="absolute right-0 top-0 opacity-5 -translate-y-1/4 translate-x-1/4 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined" style="font-size: 160px;">support_agent</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-2 relative z-10">Need more help?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 relative z-10">Our IT support team is available during standard academic hours (8AM - 6PM) for technical assistance.</p>
+<div class="space-y-4 relative z-10">
+<button onclick="openTicketModal()" class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 px-4 rounded-DEFAULT hover:opacity-90 transition-opacity flex justify-center items-center gap-2 border-b-2 border-secondary">
+<span class="material-symbols-outlined">confirmation_number</span>
+                            Raise a Ticket
+                        </button>
+<button onclick="alert('Contact email: support@eliteacademy.edu')" class="w-full bg-transparent border border-outline text-primary font-label-md text-label-md py-3 px-4 rounded-DEFAULT hover:border-secondary hover:text-secondary transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">mail</span>
+                            Email IT Support
+                        </button>
+</div>
+</div>
+<!-- Useful Resources -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-6">
+<h3 class="font-label-md text-label-md text-primary mb-4 uppercase tracking-wider text-xs">Useful Resources</h3>
+<ul class="space-y-4">
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors group" href="#" onclick="alert('Faculty Handbook loaded')">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">menu_book</span>
+<span class="font-body-sm text-body-sm underline decoration-outline-variant underline-offset-4 group-hover:decoration-primary">Faculty Handbook</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors group" href="#" onclick="alert('System Documentation loaded')">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">developer_board</span>
+<span class="font-body-sm text-body-sm underline decoration-outline-variant underline-offset-4 group-hover:decoration-primary">System Documentation</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors group" href="#" onclick="alert('Data Privacy Guidelines loaded')">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">security</span>
+<span class="font-body-sm text-body-sm underline decoration-outline-variant underline-offset-4 group-hover:decoration-primary">Data Privacy Guidelines</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+
+<script>
+function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const icon = btn.querySelector('.faq-icon');
+    if (answer.classList.contains('hidden')) {
+        answer.classList.remove('hidden');
+        if (icon) icon.textContent = 'expand_less';
+    } else {
+        answer.classList.add('hidden');
+        if (icon) icon.textContent = 'expand_more';
+    }
+}
+
+function filterFaqs() {
+    const query = document.getElementById('faqSearchInput').value.toLowerCase();
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(query)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function openTicketModal() {
+    const subject = prompt("Enter ticket subject:");
+    if (subject) {
+        alert("Support ticket created! Ticket ID: TK-" + Math.floor(10000 + Math.random() * 90000));
+    }
+}
+</script>
+</body>
+</html>

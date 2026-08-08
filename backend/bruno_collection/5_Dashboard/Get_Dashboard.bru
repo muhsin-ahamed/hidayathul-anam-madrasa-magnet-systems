@@ -1,0 +1,1 @@
+meta {\n  name: Get Dashboard\n  type: http\n  seq: 1\n}\n\nget {\n  url: {{baseUrl}}/dashboard\n  body: none\n  auth: bearer\n}\n\nauth:bearer {\n  token: {{superAdminToken}}\n}\n\n

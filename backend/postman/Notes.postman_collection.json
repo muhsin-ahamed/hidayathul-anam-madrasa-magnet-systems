@@ -1,0 +1,91 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Notes API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Note",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Chapter 1 Notes\",\n  \"description\": \"Introduction to the topic\",\n  \"class_id\": \"{{class_id}}\",\n  \"subject_id\": \"{{subject_id}}\",\n  \"file_path\": \"/uploads/notes/chap1.pdf\",\n  \"file_name\": \"chap1.pdf\",\n  \"is_published\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/notes",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "notes" ]
+        }
+      }
+    },
+    {
+      "name": "Get All Notes",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/notes",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "notes" ]
+        }
+      }
+    },
+    {
+      "name": "Get Note by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/notes/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "notes", ":id" ],
+          "variable": [ { "key": "id", "value": "{{note_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Update Note",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Chapter 1 Notes Updated\",\n  \"is_published\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/notes/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "notes", ":id" ],
+          "variable": [ { "key": "id", "value": "{{note_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Delete Note",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/notes/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "notes", ":id" ],
+          "variable": [ { "key": "id", "value": "{{note_id}}" } ]
+        }
+      }
+    }
+  ]
+}

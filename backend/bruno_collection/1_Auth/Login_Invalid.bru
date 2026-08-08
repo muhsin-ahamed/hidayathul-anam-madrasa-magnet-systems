@@ -1,0 +1,1 @@
+meta {\n  name: Login Invalid\n  type: http\n  seq: 1\n}\n\npost {\n  url: {{baseUrl}}/auth/login\n  body: json\n  auth: none\n}\n\nbody:json {\n  {"username": "invalid", "password": "bad"}\n}\n

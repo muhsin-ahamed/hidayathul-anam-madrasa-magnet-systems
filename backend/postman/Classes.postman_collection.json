@@ -1,0 +1,91 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Classes API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Class",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"class_name\": \"Class 1\",\n  \"section\": \"A\",\n  \"academic_year\": \"2023-2024\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/classes",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "classes" ]
+        }
+      }
+    },
+    {
+      "name": "Get All Classes",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/classes",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "classes" ]
+        }
+      }
+    },
+    {
+      "name": "Get Class by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/classes/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "classes", ":id" ],
+          "variable": [ { "key": "id", "value": "{{class_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Update Class",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"class_name\": \"Class 1 Updated\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/classes/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "classes", ":id" ],
+          "variable": [ { "key": "id", "value": "{{class_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Delete Class",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/classes/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "classes", ":id" ],
+          "variable": [ { "key": "id", "value": "{{class_id}}" } ]
+        }
+      }
+    }
+  ]
+}

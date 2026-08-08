@@ -1,0 +1,1 @@
+meta {\n  name: Create Teacher Success\n  type: http\n  seq: 1\n}\n\npost {\n  url: {{baseUrl}}/teachers\n  body: json\n  auth: bearer\n}\n\nauth:bearer {\n  token: {{superAdminToken}}\n}\n\nbody:json {\n  {"username": "newteacher", "email": "t@t.com", "fullName": "T", "password": "pw", "classId": "1"}\n}\n

@@ -1,0 +1,91 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Results API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Result",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"exam_id\": \"{{exam_id}}\",\n  \"student_id\": \"{{student_id}}\",\n  \"subject_id\": \"{{subject_id}}\",\n  \"marks_obtained\": 85,\n  \"maximum_marks\": 100,\n  \"grade\": \"A\",\n  \"is_published\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/results",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "results" ]
+        }
+      }
+    },
+    {
+      "name": "Get All Results",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/results",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "results" ]
+        }
+      }
+    },
+    {
+      "name": "Get Result by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/results/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "results", ":id" ],
+          "variable": [ { "key": "id", "value": "{{result_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Update Result",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"marks_obtained\": 90,\n  \"grade\": \"A+\",\n  \"is_published\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/results/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "results", ":id" ],
+          "variable": [ { "key": "id", "value": "{{result_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Delete Result",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/results/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "results", ":id" ],
+          "variable": [ { "key": "id", "value": "{{result_id}}" } ]
+        }
+      }
+    }
+  ]
+}

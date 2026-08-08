@@ -1,0 +1,22 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Dashboard API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Dashboard Stats",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "dashboard" ]
+        }
+      }
+    }
+  ]
+}

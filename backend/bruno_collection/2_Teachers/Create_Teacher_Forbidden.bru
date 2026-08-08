@@ -1,0 +1,1 @@
+meta {\n  name: Create Teacher Forbidden\n  type: http\n  seq: 1\n}\n\npost {\n  url: {{baseUrl}}/teachers\n  body: json\n  auth: bearer\n}\n\nauth:bearer {\n  token: {{studentToken}}\n}\n\nbody:json {\n  {"username": "t2", "email": "t2@t.com", "fullName": "T2", "password": "pw", "classId": "1"}\n}\n

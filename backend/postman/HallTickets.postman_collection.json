@@ -1,0 +1,91 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Hall Tickets API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Hall Ticket",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"exam_id\": \"{{exam_id}}\",\n  \"student_id\": \"{{student_id}}\",\n  \"is_published\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/hall-tickets",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "hall-tickets" ]
+        }
+      }
+    },
+    {
+      "name": "Get All Hall Tickets",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/hall-tickets",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "hall-tickets" ]
+        }
+      }
+    },
+    {
+      "name": "Get Hall Ticket by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/hall-tickets/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "hall-tickets", ":id" ],
+          "variable": [ { "key": "id", "value": "{{hall_ticket_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Update Hall Ticket",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"is_published\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/hall-tickets/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "hall-tickets", ":id" ],
+          "variable": [ { "key": "id", "value": "{{hall_ticket_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Delete Hall Ticket",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/hall-tickets/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "hall-tickets", ":id" ],
+          "variable": [ { "key": "id", "value": "{{hall_ticket_id}}" } ]
+        }
+      }
+    }
+  ]
+}

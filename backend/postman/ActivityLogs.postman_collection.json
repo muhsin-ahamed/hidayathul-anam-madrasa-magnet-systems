@@ -1,0 +1,22 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Activity Logs API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Activity Logs",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/activity-logs",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "activity-logs" ]
+        }
+      }
+    }
+  ]
+}

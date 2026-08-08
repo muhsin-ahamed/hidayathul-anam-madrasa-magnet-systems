@@ -1,0 +1,1 @@
+meta {\n  name: Upload Note\n  type: http\n  seq: 1\n}\n\npost {\n  url: {{baseUrl}}/notes\n  body: json\n  auth: bearer\n}\n\nauth:bearer {\n  token: {{teacherToken}}\n}\n\nbody:json {\n  {}\n}\n

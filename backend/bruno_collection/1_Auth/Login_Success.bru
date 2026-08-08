@@ -1,0 +1,1 @@
+meta {\n  name: Login Success\n  type: http\n  seq: 1\n}\n\npost {\n  url: {{baseUrl}}/auth/login\n  body: json\n  auth: none\n}\n\nbody:json {\n  {"username": "admin", "password": "password"}\n}\n

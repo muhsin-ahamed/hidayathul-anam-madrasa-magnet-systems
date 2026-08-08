@@ -1,0 +1,1 @@
+meta {\n  name: Get Logs Forbidden\n  type: http\n  seq: 1\n}\n\nget {\n  url: {{baseUrl}}/activity-logs\n  body: none\n  auth: bearer\n}\n\nauth:bearer {\n  token: {{studentToken}}\n}\n\n

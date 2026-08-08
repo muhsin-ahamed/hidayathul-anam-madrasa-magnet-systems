@@ -1,0 +1,91 @@
+{
+  "info": {
+    "name": "HIDAYATHUL ANAM MADRASA - Teachers API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Teacher",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"teacher_ali\",\n  \"full_name\": \"Ali Khan\",\n  \"class_number\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/teachers",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "teachers" ]
+        }
+      }
+    },
+    {
+      "name": "Get All Teachers",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/teachers",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "teachers" ]
+        }
+      }
+    },
+    {
+      "name": "Get Teacher by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/teachers/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "teachers", ":id" ],
+          "variable": [ { "key": "id", "value": "{{teacher_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Update Teacher",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"full_name\": \"Ali Khan Updated\",\n  \"is_active\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/teachers/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "teachers", ":id" ],
+          "variable": [ { "key": "id", "value": "{{teacher_id}}" } ]
+        }
+      }
+    },
+    {
+      "name": "Delete Teacher",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/teachers/:id",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "teachers", ":id" ],
+          "variable": [ { "key": "id", "value": "{{teacher_id}}" } ]
+        }
+      }
+    }
+  ]
+}

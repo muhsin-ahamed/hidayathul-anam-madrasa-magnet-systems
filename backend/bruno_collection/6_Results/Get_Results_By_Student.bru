@@ -1,0 +1,1 @@
+meta {\n  name: Get Results By Student\n  type: http\n  seq: 1\n}\n\nget {\n  url: {{baseUrl}}/results?studentId=1\n  body: none\n  auth: bearer\n}\n\nauth:bearer {\n  token: {{studentToken}}\n}\n\n
