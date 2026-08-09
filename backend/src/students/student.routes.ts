@@ -5,6 +5,8 @@ import {
   getStudent,
   updateStudent,
   deleteStudent,
+  deactivateStudentHandler,
+  activateStudentHandler,
   getStudentProfileHandler,
   getStudentDashboardHandler,
   getStudentNotesHandler,
@@ -37,5 +39,7 @@ router.get('/', getStudents);
 router.get('/:id', validate(studentIdSchema), getStudent);
 router.put('/:id', validate(updateStudentSchema), updateStudent);
 router.delete('/:id', validate(studentIdSchema), deleteStudent);
+router.post('/:id/deactivate', deactivateStudentHandler);
+router.post('/:id/activate', activateStudentHandler);
 
 export default router;

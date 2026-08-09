@@ -161,3 +161,27 @@ export const deleteStudent = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+export const deactivateStudentHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await studentService.deactivateStudent(req.params.id, req.user);
+    await logActivity(req.user?.id, 'Deactivate', 'Student', req.params.id, 'Deactivated student');
+    return res.status(200).json(result);
+  } catch (error: any) {
+    if (error.message === 'Student not found') return res.status(404).json({ success: false, message: error.message });
+    if (error.message?.includes('Not authorized')) return res.status(403).json({ success: false, message: error.message });
+    next(error);
+  }
+};
+
+export const activateStudentHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await studentService.activateStudent(req.params.id, req.user);
+    await logActivity(req.user?.id, 'Activate', 'Student', req.params.id, 'Activated student');
+    return res.status(200).json(result);
+  } catch (error: any) {
+    if (error.message === 'Student not found') return res.status(404).json({ success: false, message: error.message });
+    if (error.message?.includes('Not authorized')) return res.status(403).json({ success: false, message: error.message });
+    next(error);
+  }
+};

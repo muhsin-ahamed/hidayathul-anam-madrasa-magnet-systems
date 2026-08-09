@@ -555,9 +555,76 @@ export const deleteStudent = async (id: string, user: any) => {
     }
   }
 
-  await prisma.profiles.delete({
-    where: { id: student.profile_id! },
-  });
+  try {
+    if (student.profile_id) {
+      await prisma.profiles.delete({
+        where: { id: student.profile_id },
+      });
+    } else {
+      await prisma.students.delete({
+        where: { id },
+      });
+    }
+  } catch (err) {
+    if (student.profile_id) {
+      await prisma.profiles.update({
+        where: { id: student.profile_id },
+        data: { is_active: false },
+      });
+    }
+  }
 
   return { success: true };
+};
+
+export const deactivateStudent = async (id: string, user: any) => {
+  const student = await prisma.students.findUnique({
+    where: { id },
+  });
+
+  if (!student) throw new Error('Student not found');
+
+  if (user.role === 'class_teacher') {
+    const teacherClass = await prisma.classes.findFirst({
+      where: { class_teacher_id: user.id },
+    });
+    if (!teacherClass || teacherClass.id !== student.class_id) {
+      throw new Error('Not authorized to modify this student');
+    }
+  }
+
+  if (student.profile_id) {
+    await prisma.profiles.update({
+      where: { id: student.profile_id },
+      data: { is_active: false },
+    });
+  }
+
+  return { success: true, message: 'Student deactivated successfully' };
+};
+
+export const activateStudent = async (id: string, user: any) => {
+  const student = await prisma.students.findUnique({
+    where: { id },
+  });
+
+  if (!student) throw new Error('Student not found');
+
+  if (user.role === 'class_teacher') {
+    const teacherClass = await prisma.classes.findFirst({
+      where: { class_teacher_id: user.id },
+    });
+    if (!teacherClass || teacherClass.id !== student.class_id) {
+      throw new Error('Not authorized to modify this student');
+    }
+  }
+
+  if (student.profile_id) {
+    await prisma.profiles.update({
+      where: { id: student.profile_id },
+      data: { is_active: true },
+    });
+  }
+
+  return { success: true, message: 'Student activated successfully' };
 };
