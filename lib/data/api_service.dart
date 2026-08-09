@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 
 class ApiService {
   static const String baseUrl = String.fromEnvironment(
-    'BACKEND_URL',
-    defaultValue: 'https://backend-xi-swart-31.vercel.app/api',
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:5000/api',
   );
 
   static final Dio dio = Dio(

@@ -23,7 +23,26 @@ import subjectRoutes from './subjects/subject.routes';
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://localhost:8080',
+].filter(Boolean) as string[];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, server-to-server) or matching origins
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Allow all web origins for public API access
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,6 +55,14 @@ app.use('/uploads', express.static(uploadsPath));
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Backend API is running' });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
 
 // Signed URL generator endpoint for files
