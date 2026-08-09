@@ -84,16 +84,13 @@ class _LoginPageState extends State<LoginPage> {
     final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF45464D);
     final inputBgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF7F9FB);
 
-    const libraryBgUrl =
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCEbrYFpq9Zp4XQ_9idguGJQwnWhcuTgPEeue-siEiFK-iWZb1nZERz84xBws6n78st-vodWAQ8zyiapIhfYMTCrAnomyYuYfUMBv7prI8Md4PPumVOf9MC9uMJiHtnH3u545EoDA2ZzuuHzxPeFe7dTNy_Uc1CunwwPVevpr3ZKOvf7AvG8qcCjfgTQysXz0Im-iQKLaqvKzcWRCCZ3uq9sSP-t4xna20m9Vxi6aYhzrm7Jjtuy93a';
-
     return Scaffold(
       body: Stack(
         children: [
           // Background Image with Blur & Color Overlay
           Positioned.fill(
-            child: Image.network(
-              libraryBgUrl,
+            child: Image.asset(
+              'assets/images/madrasa_bg.jpg',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(color: isDark ? const Color(0xFF020617) : const Color(0xFFF7F9FB));
@@ -102,9 +99,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           Positioned.fill(
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
               child: Container(
-                color: (isDark ? const Color(0xFF0F172A) : const Color(0xFFF7F9FB)).withValues(alpha: isDark ? 0.88 : 0.82),
+                color: (isDark ? const Color(0xFF0F172A) : const Color(0xFFF7F9FB)).withValues(alpha: isDark ? 0.75 : 0.65),
               ),
             ),
           ),
