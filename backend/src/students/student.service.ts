@@ -556,14 +556,15 @@ export const deleteStudent = async (id: string, user: any) => {
   }
 
   try {
+    await prisma.results.deleteMany({ where: { student_id: id } });
+    await prisma.hall_tickets.deleteMany({ where: { student_id: id } });
+
     if (student.profile_id) {
-      await prisma.profiles.delete({
-        where: { id: student.profile_id },
-      });
+      await prisma.users.deleteMany({ where: { profile_id: student.profile_id } });
+      await prisma.students.delete({ where: { id } });
+      await prisma.profiles.delete({ where: { id: student.profile_id } }).catch(() => {});
     } else {
-      await prisma.students.delete({
-        where: { id },
-      });
+      await prisma.students.delete({ where: { id } });
     }
   } catch (err) {
     if (student.profile_id) {
@@ -571,6 +572,7 @@ export const deleteStudent = async (id: string, user: any) => {
         where: { id: student.profile_id },
         data: { is_active: false },
       });
+      await prisma.students.delete({ where: { id } }).catch(() => {});
     }
   }
 

@@ -177,13 +177,15 @@ class _TeacherStudentsPageState extends State<TeacherStudentsPage> {
   }
 
   void _deleteStudent(Student student) async {
+    final studentRepo = context.read<StudentRepository>();
+    final activityRepo = context.read<ActivityLogRepository>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
           (ctx) => AlertDialog(
             title: const Text('Delete Student'),
             content: Text(
-              'Are you sure you want to delete ${student.fullName}? This action will deactivate their account.',
+              'Are you sure you want to permanently delete ${student.fullName}?',
             ),
             actions: [
               TextButton(
@@ -203,7 +205,25 @@ class _TeacherStudentsPageState extends State<TeacherStudentsPage> {
     );
 
     if (confirmed == true) {
-      _toggleStudentStatus(student);
+      try {
+        setState(() => _isLoading = true);
+        await studentRepo.deleteStudent(student.id);
+        await activityRepo.logActivity(
+          action: 'Deleted Student',
+          entityType: 'student',
+          entityId: student.id,
+          description: 'Deleted student ${student.fullName}',
+          classId: student.classId,
+        );
+        if (!mounted) return;
+        _loadStudents();
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
