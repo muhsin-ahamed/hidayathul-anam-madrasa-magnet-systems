@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   const SizedBox(height: 20),
                                   Text(
-                                    'HIDAYATHUL ANAM MADRASA Portal',
+                                    'HIDAYATHUL ANAM MADRASA PORTAL',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 24,
