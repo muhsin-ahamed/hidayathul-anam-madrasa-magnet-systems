@@ -395,7 +395,8 @@ class _SuperAdminAcademicPageState extends State<SuperAdminAcademicPage>
                                 'Class Assignment: ${exam.className ?? "N/A"}',
                               ),
                               Text(
-                                'Start Date: ${exam.startDate?.toLocal().toString().substring(0, 10) ?? "TBA"}',
+                                'Date of Examination: ${exam.startDate?.toLocal().toString().substring(0, 10) ?? "TBA"}',
+                                style: const TextStyle(fontWeight: FontWeight.w600),
                               ),
                               const Divider(),
                               Wrap(
@@ -668,7 +669,20 @@ class _ExamFormDialogState extends State<_ExamFormDialog> {
   );
 
   String? _classId;
+  DateTime _startDate = DateTime.now().add(const Duration(days: 7));
   bool _isLoading = false;
+
+  Future<void> _selectStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+    );
+    if (picked != null) {
+      setState(() => _startDate = picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -700,6 +714,20 @@ class _ExamFormDialogState extends State<_ExamFormDialog> {
               ],
               onChanged: (val) => setState(() => _classId = val),
             ),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: _selectStartDate,
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: 'Date of Examination',
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                child: Text(
+                  '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -728,7 +756,7 @@ class _ExamFormDialogState extends State<_ExamFormDialog> {
                             examName: _nameController.text.trim(),
                             classId: cls.id,
                             examCenter: _centerController.text.trim(),
-                            startDate: DateTime.now().add(const Duration(days: 7)),
+                            startDate: _startDate,
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now(),
                           ),
@@ -740,7 +768,7 @@ class _ExamFormDialogState extends State<_ExamFormDialog> {
                         examName: _nameController.text.trim(),
                         classId: _classId!,
                         examCenter: _centerController.text.trim(),
-                        startDate: DateTime.now().add(const Duration(days: 7)),
+                        startDate: _startDate,
                         createdAt: DateTime.now(),
                         updatedAt: DateTime.now(),
                       );
