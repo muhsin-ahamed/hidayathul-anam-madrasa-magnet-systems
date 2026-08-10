@@ -140,38 +140,35 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
 
   const errors: string[] = [];
   const validItems: any[] = [];
+  const isUuid = (str: string) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(str);
+
+  // Metadata keys to ignore when picking subject columns in matrix Excel
+  const METADATA_KEYS = new Set([
+    'ADMISSIONNO', 'ADMISSIONNUMBER', 'ADMNO', 'ADMISSION', 'STUDENTID',
+    'STUDENTNAME', 'NAME', 'STUDENT',
+    'TOTAL', 'TOTAL200', 'TOTALMARKS', 'MAXIMUMMARKS', 'TOTALMARKOBAINED',
+    'GRADE', 'GRADENAME',
+    'STATUS', 'RANK', 'STATUSRANK', 'STATURANK',
+    'SLNO', 'SNO', 'SERIALNO',
+    'EXAM', 'EXAMNAME', 'TERM',
+    'REMARKS', 'REMARK'
+  ]);
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const rowNum = i + 1;
 
-    const admissionNum = String(
-      row['Admission Number'] ?? row['admission_number'] ?? row['AdmissionNo'] ?? row['Admission Number*'] ?? ''
-    ).trim();
-
-    const subjectInput = String(
-      row['Subject'] ?? row['subject'] ?? row['SubjectName'] ?? row['subject_name'] ?? row['subject_code'] ?? ''
-    ).trim();
-
-    const examInput = String(
-      row['Exam'] ?? row['exam'] ?? row['ExamName'] ?? row['exam_name'] ?? ''
-    ).trim();
-
-    const rawMarks = row['Marks'] ?? row['marks_obtained'] ?? row['MarksObtained'] ?? row['Marks Obtained'];
-    const rawTotal = row['Total Marks'] ?? row['maximum_marks'] ?? row['TotalMarks'] ?? row['Maximum Marks'] ?? 100;
-    const gradeInput = row['Grade'] ?? row['grade'];
-    const remarksInput = row['Remarks'] ?? row['remarks'];
+    let admissionNum = '';
+    for (const k of Object.keys(row)) {
+      const norm = k.trim().toUpperCase().replace(/[`'\s_]/g, '');
+      if (['ADMISSIONNO', 'ADMISSIONNUMBER', 'ADMNO', 'ADMISSION', 'STUDENTID'].includes(norm)) {
+        admissionNum = String(row[k]).trim();
+        break;
+      }
+    }
 
     if (!admissionNum) {
       errors.push(`Row ${rowNum}: Missing Admission Number`);
-      continue;
-    }
-    if (!subjectInput) {
-      errors.push(`Row ${rowNum}: Missing Subject`);
-      continue;
-    }
-    if (!examInput) {
-      errors.push(`Row ${rowNum}: Missing Exam`);
       continue;
     }
 
@@ -188,78 +185,117 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
       continue;
     }
 
-    const isUuid = (str: string) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(str);
+    let examInput = String(
+      row['Exam'] ?? row['exam'] ?? row['ExamName'] ?? row['exam_name'] ?? body.examId ?? body.exam_id ?? body.exam ?? ''
+    ).trim();
 
-    const subject = await prisma.subjects.findFirst({
-      where: {
-        OR: [
-          ...(isUuid(subjectInput) ? [{ id: subjectInput }] : []),
-          { subject_name: { equals: subjectInput, mode: 'insensitive' } },
-          { subject_code: { equals: subjectInput, mode: 'insensitive' } },
-        ]
-      }
-    });
-    if (!subject) {
-      errors.push(`Row ${rowNum}: Subject '${subjectInput}' not found`);
+    let exam: any = null;
+    if (examInput) {
+      exam = await prisma.exams.findFirst({
+        where: {
+          OR: [
+            ...(isUuid(examInput) ? [{ id: examInput }] : []),
+            { exam_name: { equals: examInput, mode: 'insensitive' } },
+          ]
+        }
+      });
+    }
+
+    if (!exam && student.class_id) {
+      exam = await prisma.exams.findFirst({
+        where: { class_id: student.class_id },
+        orderBy: { created_at: 'desc' }
+      });
+    }
+
+    if (!exam) {
+      errors.push(`Row ${rowNum}: No valid exam specified or found for student '${admissionNum}'`);
       continue;
     }
 
-    if (student.class_id) {
-      const studentClass = await prisma.classes.findUnique({ where: { id: student.class_id } });
-      if (studentClass && !isValidSubjectForClass(studentClass.class_name, subject.subject_name)) {
-        errors.push(`Row ${rowNum}: Subject '${subject.subject_name}' is not allowed for ${studentClass.class_name}`);
+    const singleSubjectInput = String(
+      row['Subject'] ?? row['subject'] ?? row['SubjectName'] ?? row['subject_name'] ?? row['subject_code'] ?? ''
+    ).trim();
+
+    const subjectEntries: { name: string; marks: any }[] = [];
+
+    if (singleSubjectInput) {
+      subjectEntries.push({
+        name: singleSubjectInput,
+        marks: row['Marks'] ?? row['marks_obtained'] ?? row['MarksObtained'] ?? row['Marks Obtained']
+      });
+    } else {
+      for (const k of Object.keys(row)) {
+        const norm = k.trim().toUpperCase().replace(/[`'\s_()0-9]/g, '');
+        if (!METADATA_KEYS.has(norm) && row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '') {
+          subjectEntries.push({ name: k.trim(), marks: row[k] });
+        }
+      }
+    }
+
+    if (subjectEntries.length === 0) {
+      errors.push(`Row ${rowNum}: No subjects or marks found for student '${admissionNum}'`);
+      continue;
+    }
+
+    for (const subEntry of subjectEntries) {
+      const subjectInput = subEntry.name;
+      let subject = await prisma.subjects.findFirst({
+        where: {
+          OR: [
+            ...(isUuid(subjectInput) ? [{ id: subjectInput }] : []),
+            { subject_name: { equals: subjectInput, mode: 'insensitive' } },
+            { subject_code: { equals: subjectInput, mode: 'insensitive' } },
+          ]
+        }
+      });
+
+      if (!subject && student.class_id) {
+        subject = await prisma.subjects.create({
+          data: {
+            class_id: student.class_id,
+            subject_name: subjectInput,
+            subject_code: subjectInput.substring(0, 10).toUpperCase(),
+          }
+        });
+      }
+
+      if (!subject) {
+        errors.push(`Row ${rowNum}: Subject '${subjectInput}' not found`);
         continue;
       }
-    }
 
-    const exam = await prisma.exams.findFirst({
-      where: {
-        OR: [
-          ...(isUuid(examInput) ? [{ id: examInput }] : []),
-          { exam_name: { equals: examInput, mode: 'insensitive' } },
-        ]
+      const marksObtained = Number(subEntry.marks);
+      const maximumMarks = Number(row['Total Marks'] ?? row['maximum_marks'] ?? row['TotalMarks'] ?? 100) || 100;
+
+      if (isNaN(marksObtained)) {
+        errors.push(`Row ${rowNum}: Invalid marks '${subEntry.marks}' for subject '${subjectInput}'`);
+        continue;
       }
-    });
-    if (!exam) {
-      errors.push(`Row ${rowNum}: Exam '${examInput}' not found`);
-      continue;
+
+      let grade = row['Grade'] ?? row['grade'];
+      if (!grade) {
+        const pct = (marksObtained / maximumMarks) * 100;
+        if (pct >= 90) grade = 'A+';
+        else if (pct >= 80) grade = 'A';
+        else if (pct >= 70) grade = 'B+';
+        else if (pct >= 60) grade = 'B';
+        else if (pct >= 50) grade = 'C';
+        else if (pct >= 40) grade = 'D';
+        else grade = 'F';
+      }
+
+      validItems.push({
+        exam_id: exam.id,
+        student_id: student.id,
+        subject_id: subject.id,
+        marks_obtained: marksObtained,
+        maximum_marks: maximumMarks,
+        grade: String(grade).trim(),
+        remarks: row['Remarks'] ?? row['remarks'] ?? null,
+        created_by: user.id,
+      });
     }
-
-    const marksObtained = Number(rawMarks);
-    const maximumMarks = Number(rawTotal) || 100;
-
-    if (isNaN(marksObtained)) {
-      errors.push(`Row ${rowNum}: Invalid marks '${rawMarks}'`);
-      continue;
-    }
-
-    if (marksObtained < 0 || marksObtained > maximumMarks) {
-      errors.push(`Row ${rowNum}: Marks obtained (${marksObtained}) cannot exceed maximum marks (${maximumMarks})`);
-      continue;
-    }
-
-    let grade = gradeInput ? String(gradeInput).trim() : null;
-    if (!grade) {
-      const pct = (marksObtained / maximumMarks) * 100;
-      if (pct >= 90) grade = 'A+';
-      else if (pct >= 80) grade = 'A';
-      else if (pct >= 70) grade = 'B+';
-      else if (pct >= 60) grade = 'B';
-      else if (pct >= 50) grade = 'C';
-      else if (pct >= 40) grade = 'D';
-      else grade = 'F';
-    }
-
-    validItems.push({
-      exam_id: exam.id,
-      student_id: student.id,
-      subject_id: subject.id,
-      marks_obtained: marksObtained,
-      maximum_marks: maximumMarks,
-      grade,
-      remarks: remarksInput ? String(remarksInput).trim() : null,
-      created_by: user.id,
-    });
   }
 
   const importedCount = validItems.length;

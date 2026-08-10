@@ -280,36 +280,10 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: DataTable(
-                          columns: const [
-                            DataColumn(label: Text('Admission Number')),
-                            DataColumn(label: Text('Student Name')),
-                            DataColumn(label: Text('Subject')),
-                            DataColumn(label: Text('Exam')),
-                            DataColumn(label: Text('Marks')),
-                            DataColumn(label: Text('Total Marks')),
-                            DataColumn(label: Text('Grade')),
-                            DataColumn(label: Text('Remarks')),
-                          ],
+                          columns: previewRows.first.keys.map((k) => DataColumn(label: Text(k.toString(), style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
                           rows: previewRows.map((r) {
-                            final adm = r['Admission Number'] ?? r['admission_number'] ?? r['AdmissionNo'] ?? '';
-                            final name = r['Student Name'] ?? r['student_name'] ?? r['StudentName'] ?? '';
-                            final sub = r['Subject'] ?? r['subject'] ?? r['SubjectName'] ?? '';
-                            final exam = r['Exam'] ?? r['exam'] ?? r['ExamName'] ?? '';
-                            final marks = r['Marks'] ?? r['marks_obtained'] ?? r['MarksObtained'] ?? '';
-                            final total = r['Total Marks'] ?? r['maximum_marks'] ?? r['TotalMarks'] ?? '100';
-                            final grade = r['Grade'] ?? r['grade'] ?? 'Auto';
-                            final remarks = r['Remarks'] ?? r['remarks'] ?? '';
                             return DataRow(
-                              cells: [
-                                DataCell(Text(adm)),
-                                DataCell(Text(name)),
-                                DataCell(Text(sub)),
-                                DataCell(Text(exam)),
-                                DataCell(Text(marks)),
-                                DataCell(Text(total)),
-                                DataCell(Text(grade)),
-                                DataCell(Text(remarks)),
-                              ],
+                              cells: r.keys.map((k) => DataCell(Text(r[k]?.toString() ?? ''))).toList(),
                             );
                           }).toList(),
                         ),
@@ -384,10 +358,10 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
 
   void _downloadTemplate() {
     final sampleCsv = 
-        "Admission Number,Student Name,Subject,Exam,Marks,Total Marks,Grade,Remarks\n"
-        "ADM001,Muhammed Bilal,Islamic Studies,Mid Term Exam,88,100,A,Excellent progress\n"
-        "ADM002,Fathima Zahra,Arabic Language,Mid Term Exam,95,100,A+,Top scorer\n"
-        "ADM003,Aisha Siddiqua,Fiqh,Mid Term Exam,76,100,B+,Good effort";
+        "ADMISSION NO`,STUDENT NAME,THAREEEQ,LISANUL QURAN,DUROOSUL IHSAN,FIQH,TOTAL (200),Grade,STATUS (rank)\n"
+        "1320,M.MISHHAL,6,18,20,7,51,,8\n"
+        "1306,SHAMMAS,8,20,11,12,51,,8\n"
+        "1324,M.SINAN M,9,18,25,18,70,,5";
 
     showDialog(
       context: context,
@@ -400,14 +374,14 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
           ],
         ),
         content: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: MediaQuery.of(ctx).size.width * 0.9 < 750 ? MediaQuery.of(ctx).size.width * 0.9 : 750),
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(ctx).size.width * 0.9 < 800 ? MediaQuery.of(ctx).size.width * 0.9 : 800),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Upload files must be formatted as an Excel (.xlsx) or CSV (.csv) file with the following column headers in the first row:',
+                  'Upload files formatted as an Excel (.xlsx) or CSV (.csv) file with the following column headers:',
                   style: TextStyle(fontSize: 14, color: Color(0xFF45464D)),
                 ),
                 const SizedBox(height: 16),
@@ -417,50 +391,40 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
                   children: const [
                     Chip(
                       avatar: CircleAvatar(child: Text('1', style: TextStyle(fontSize: 10))),
-                      label: Text('Admission Number *'),
+                      label: Text('ADMISSION NO *'),
                       backgroundColor: Color(0xFFEFF6FF),
                     ),
                     Chip(
                       avatar: CircleAvatar(child: Text('2', style: TextStyle(fontSize: 10))),
-                      label: Text('Student Name'),
+                      label: Text('STUDENT NAME'),
                     ),
                     Chip(
                       avatar: CircleAvatar(child: Text('3', style: TextStyle(fontSize: 10))),
-                      label: Text('Subject *'),
+                      label: Text('Subject Columns * (e.g. THAREEEQ, LISANUL QURAN, DUROOSUL IHSAN, FIQH)'),
                       backgroundColor: Color(0xFFEFF6FF),
                     ),
                     Chip(
                       avatar: CircleAvatar(child: Text('4', style: TextStyle(fontSize: 10))),
-                      label: Text('Exam *'),
-                      backgroundColor: Color(0xFFEFF6FF),
+                      label: Text('TOTAL (200)'),
                     ),
                     Chip(
                       avatar: CircleAvatar(child: Text('5', style: TextStyle(fontSize: 10))),
-                      label: Text('Marks *'),
-                      backgroundColor: Color(0xFFEFF6FF),
-                    ),
-                    Chip(
-                      avatar: CircleAvatar(child: Text('6', style: TextStyle(fontSize: 10))),
-                      label: Text('Total Marks'),
-                    ),
-                    Chip(
-                      avatar: CircleAvatar(child: Text('7', style: TextStyle(fontSize: 10))),
                       label: Text('Grade'),
                     ),
                     Chip(
-                      avatar: CircleAvatar(child: Text('8', style: TextStyle(fontSize: 10))),
-                      label: Text('Remarks'),
+                      avatar: CircleAvatar(child: Text('6', style: TextStyle(fontSize: 10))),
+                      label: Text('STATUS (rank)'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  '* Fields marked with blue background are mandatory.',
+                  '* Admission No and Subject Marks columns are mandatory.',
                   style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontStyle: FontStyle.italic),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Sample Template Preview:',
+                  'Sample Class Template Preview:',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).textTheme.bodyLarge?.color),
                 ),
                 const SizedBox(height: 8),
@@ -470,45 +434,49 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
                     border: TableBorder.all(color: Colors.grey.shade300, width: 1),
                     headingRowColor: WidgetStateProperty.all(const Color(0xFFF1F5F9)),
                     columns: const [
-                      DataColumn(label: Text('Admission Number', style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(label: Text('Student Name', style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(label: Text('Subject', style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(label: Text('Exam', style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(label: Text('Marks', style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(label: Text('Total Marks', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('ADMISSION NO`', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('STUDENT NAME', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('THAREEEQ', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('LISANUL QURAN', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('DUROOSUL IHSAN', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('FIQH', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('TOTAL (200)', style: TextStyle(fontWeight: FontWeight.bold))),
                       DataColumn(label: Text('Grade', style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(label: Text('Remarks', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('STATUS (rank)', style: TextStyle(fontWeight: FontWeight.bold))),
                     ],
                     rows: const [
                       DataRow(cells: [
-                        DataCell(Text('ADM001')),
-                        DataCell(Text('Muhammed Bilal')),
-                        DataCell(Text('Islamic Studies')),
-                        DataCell(Text('Mid Term Exam')),
-                        DataCell(Text('88')),
-                        DataCell(Text('100')),
-                        DataCell(Text('A')),
-                        DataCell(Text('Excellent progress')),
+                        DataCell(Text('1320')),
+                        DataCell(Text('M.MISHHAL')),
+                        DataCell(Text('6')),
+                        DataCell(Text('18')),
+                        DataCell(Text('20')),
+                        DataCell(Text('7')),
+                        DataCell(Text('51')),
+                        DataCell(Text('')),
+                        DataCell(Text('8')),
                       ]),
                       DataRow(cells: [
-                        DataCell(Text('ADM002')),
-                        DataCell(Text('Fathima Zahra')),
-                        DataCell(Text('Arabic Language')),
-                        DataCell(Text('Mid Term Exam')),
-                        DataCell(Text('95')),
-                        DataCell(Text('100')),
-                        DataCell(Text('A+')),
-                        DataCell(Text('Top scorer')),
+                        DataCell(Text('1306')),
+                        DataCell(Text('SHAMMAS')),
+                        DataCell(Text('8')),
+                        DataCell(Text('20')),
+                        DataCell(Text('11')),
+                        DataCell(Text('12')),
+                        DataCell(Text('51')),
+                        DataCell(Text('')),
+                        DataCell(Text('8')),
                       ]),
                       DataRow(cells: [
-                        DataCell(Text('ADM003')),
-                        DataCell(Text('Aisha Siddiqua')),
-                        DataCell(Text('Fiqh')),
-                        DataCell(Text('Mid Term Exam')),
-                        DataCell(Text('76')),
-                        DataCell(Text('100')),
-                        DataCell(Text('B+')),
-                        DataCell(Text('Good effort')),
+                        DataCell(Text('1324')),
+                        DataCell(Text('M.SINAN M')),
+                        DataCell(Text('9')),
+                        DataCell(Text('18')),
+                        DataCell(Text('25')),
+                        DataCell(Text('18')),
+                        DataCell(Text('70')),
+                        DataCell(Text('')),
+                        DataCell(Text('5')),
                       ]),
                     ],
                   ),
