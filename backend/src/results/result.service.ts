@@ -195,26 +195,53 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
         const finalAdmNo = cleanAdmissionNum || `ADM_${Date.now()}_${i}`;
         const finalName = studentNameInput || `Student ${finalAdmNo}`;
 
-        const profile = await prisma.profiles.create({
-          data: {
-            full_name: finalName,
-            username: finalAdmNo,
-            role: 'student',
-            is_active: true,
-          }
+        let profile = await prisma.profiles.findFirst({
+          where: { username: finalAdmNo }
         });
 
-        student = await prisma.students.create({
-          data: {
-            profile_id: profile.id,
-            admission_number: finalAdmNo,
-            full_name: finalName,
-            roll_number: String(rowNum),
-            class_id: targetClassId,
+        if (!profile) {
+          try {
+            profile = await prisma.profiles.create({
+              data: {
+                full_name: finalName,
+                username: finalAdmNo,
+                role: 'student',
+                is_active: true,
+              }
+            });
+          } catch (e) {
+            profile = await prisma.profiles.findFirst({
+              where: { username: finalAdmNo }
+            });
           }
-        });
-      } else {
-        errors.push(`Row ${rowNum}: Student '${studentNameInput || cleanAdmissionNum}' not found`);
+        }
+
+        if (profile) {
+          student = await prisma.students.findFirst({
+            where: {
+              OR: [
+                { profile_id: profile.id },
+                { admission_number: finalAdmNo }
+              ]
+            }
+          });
+
+          if (!student) {
+            student = await prisma.students.create({
+              data: {
+                profile_id: profile.id,
+                admission_number: finalAdmNo,
+                full_name: finalName,
+                roll_number: String(rowNum),
+                class_id: targetClassId,
+              }
+            });
+          }
+        }
+      }
+
+      if (!student) {
+        errors.push(`Row ${rowNum}: Student '${studentNameInput || cleanAdmissionNum}' could not be created`);
         continue;
       }
     }
@@ -287,7 +314,8 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
     } else {
       for (const k of Object.keys(row)) {
         const norm = k.trim().toUpperCase().replace(/[`'\s_()0-9]/g, '');
-        if (!METADATA_KEYS.has(norm) && row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '') {
+        const valStr = String(row[k]).trim();
+        if (!METADATA_KEYS.has(norm) && row[k] !== undefined && row[k] !== null && valStr !== '' && !valStr.startsWith('=') && !valStr.startsWith('SUM(') && !valStr.startsWith('RANK(')) {
           subjectEntries.push({ name: k.trim(), marks: row[k] });
         }
       }
