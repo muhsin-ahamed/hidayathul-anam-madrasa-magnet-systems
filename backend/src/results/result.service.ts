@@ -190,8 +190,33 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
     });
 
     if (!student) {
-      errors.push(`Row ${rowNum}: Student '${studentNameInput || cleanAdmissionNum}' not found`);
-      continue;
+      const targetClassId = teacherClassId;
+      if (targetClassId && (cleanAdmissionNum || studentNameInput)) {
+        const finalAdmNo = cleanAdmissionNum || `ADM_${Date.now()}_${i}`;
+        const finalName = studentNameInput || `Student ${finalAdmNo}`;
+
+        const profile = await prisma.profiles.create({
+          data: {
+            full_name: finalName,
+            username: finalAdmNo,
+            role: 'student',
+            is_active: true,
+          }
+        });
+
+        student = await prisma.students.create({
+          data: {
+            profile_id: profile.id,
+            admission_number: finalAdmNo,
+            full_name: finalName,
+            roll_number: String(rowNum),
+            class_id: targetClassId,
+          }
+        });
+      } else {
+        errors.push(`Row ${rowNum}: Student '${studentNameInput || cleanAdmissionNum}' not found`);
+        continue;
+      }
     }
 
     if (user.role === 'class_teacher' && teacherClassId) {
