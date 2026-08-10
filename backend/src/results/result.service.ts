@@ -109,6 +109,27 @@ export const uploadResultsBulk = async (data: any, user: any) => {
   return createdOrUpdated;
 };
 
+const getNextRollNumber = async (classId: string, preferredRoll?: string) => {
+  if (preferredRoll) {
+    const existing = await prisma.students.findFirst({
+      where: { class_id: classId, roll_number: preferredRoll }
+    });
+    if (!existing) return preferredRoll;
+  }
+
+  const existingStudents = await prisma.students.findMany({
+    where: { class_id: classId },
+    select: { roll_number: true }
+  });
+
+  const usedNumbers = new Set(existingStudents.map(s => parseInt(s.roll_number, 10)).filter(n => !isNaN(n)));
+  let nextRoll = 1;
+  while (usedNumbers.has(nextRoll)) {
+    nextRoll++;
+  }
+  return String(nextRoll);
+};
+
 export const importResults = async (fileBuffer: Buffer | undefined, body: any, user: any) => {
   let rows: any[] = [];
   if (fileBuffer) {
@@ -151,7 +172,8 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
     'STATUS', 'RANK', 'STATUSRANK', 'STATURANK',
     'SLNO', 'SNO', 'SERIALNO',
     'EXAM', 'EXAMNAME', 'TERM',
-    'REMARKS', 'REMARK'
+    'REMARKS', 'REMARK',
+    'SUM', 'AVERAGE', 'COUNT'
   ]);
 
   for (let i = 0; i < rows.length; i++) {
@@ -227,15 +249,29 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
           });
 
           if (!student) {
-            student = await prisma.students.create({
-              data: {
-                profile_id: profile.id,
-                admission_number: finalAdmNo,
-                full_name: finalName,
-                roll_number: String(rowNum),
-                class_id: targetClassId,
-              }
-            });
+            const nextRoll = await getNextRollNumber(targetClassId, cleanAdmissionNum || String(rowNum));
+            try {
+              student = await prisma.students.create({
+                data: {
+                  profile_id: profile.id,
+                  admission_number: finalAdmNo,
+                  full_name: finalName,
+                  roll_number: nextRoll,
+                  class_id: targetClassId,
+                }
+              });
+            } catch (rollErr) {
+              const fallbackRoll = `${nextRoll}_${Date.now() % 1000}`;
+              student = await prisma.students.create({
+                data: {
+                  profile_id: profile.id,
+                  admission_number: finalAdmNo,
+                  full_name: finalName,
+                  roll_number: fallbackRoll,
+                  class_id: targetClassId,
+                }
+              }).catch(() => null);
+            }
           }
         }
       }
