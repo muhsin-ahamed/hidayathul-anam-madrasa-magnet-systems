@@ -167,22 +167,43 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
       }
     }
 
-    if (!admissionNum) {
-      errors.push(`Row ${rowNum}: Missing Admission Number`);
-      continue;
-    }
+    const studentNameInput = String(
+      row['STUDENT NAME'] ?? row['Student Name'] ?? row['student_name'] ?? row['Name'] ?? row['name'] ?? ''
+    ).trim();
 
-    const student = await prisma.students.findUnique({
-      where: { admission_number: admissionNum },
+    const cleanAdmissionNum = admissionNum.replace(/\.0$/, '').trim();
+
+    let student = await prisma.students.findFirst({
+      where: {
+        OR: [
+          ...(cleanAdmissionNum ? [
+            { admission_number: { equals: cleanAdmissionNum, mode: 'insensitive' as const } },
+            { admission_number: { equals: `ADM${cleanAdmissionNum}`, mode: 'insensitive' as const } },
+            { admission_number: { contains: cleanAdmissionNum, mode: 'insensitive' as const } },
+          ] : []),
+          ...(studentNameInput ? [
+            { full_name: { equals: studentNameInput, mode: 'insensitive' as const } },
+            { full_name: { contains: studentNameInput, mode: 'insensitive' as const } },
+          ] : [])
+        ]
+      }
     });
+
     if (!student) {
-      errors.push(`Row ${rowNum}: Student with admission number '${admissionNum}' not found`);
+      errors.push(`Row ${rowNum}: Student '${studentNameInput || cleanAdmissionNum}' not found`);
       continue;
     }
 
-    if (user.role === 'class_teacher' && student.class_id !== teacherClassId) {
-      errors.push(`Row ${rowNum}: Student '${student.full_name}' (${admissionNum}) does not belong to your assigned class`);
-      continue;
+    if (user.role === 'class_teacher' && teacherClassId) {
+      if (!student.class_id) {
+        student = await prisma.students.update({
+          where: { id: student.id },
+          data: { class_id: teacherClassId },
+        });
+      } else if (student.class_id !== teacherClassId) {
+        errors.push(`Row ${rowNum}: Student '${student.full_name}' (${admissionNum}) does not belong to your assigned class`);
+        continue;
+      }
     }
 
     let examInput = String(
@@ -195,7 +216,7 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
         where: {
           OR: [
             ...(isUuid(examInput) ? [{ id: examInput }] : []),
-            { exam_name: { equals: examInput, mode: 'insensitive' } },
+            { exam_name: { equals: examInput, mode: 'insensitive' as const } },
           ]
         }
       });
@@ -208,8 +229,22 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
       });
     }
 
+    if (!exam && student.class_id) {
+      const examName = examInput || 'Term Exam';
+      exam = await prisma.exams.create({
+        data: {
+          class_id: student.class_id,
+          exam_name: examName,
+          term: 'Term 1',
+          start_date: new Date(),
+          end_date: new Date(),
+          results_published: true,
+        }
+      });
+    }
+
     if (!exam) {
-      errors.push(`Row ${rowNum}: No valid exam specified or found for student '${admissionNum}'`);
+      errors.push(`Row ${rowNum}: Could not find or create exam for student '${admissionNum}'`);
       continue;
     }
 

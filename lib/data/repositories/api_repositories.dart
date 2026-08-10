@@ -621,14 +621,18 @@ class ApiResultRepository implements ResultRepository {
 
       final rawList = res.data != null ? (res.data['data'] ?? res.data['results']) : null;
       if (rawList is List) {
-        try {
-          final parsed = rawList.map((x) => Result.fromMap(x as Map<String, dynamic>)).toList();
-          debugPrint('[PARSED JSON COUNT]: ${parsed.length}');
-          return parsed;
-        } catch (parseError) {
-          debugPrint('[FLUTTER RESULTS REPO ERROR] Parsing exception: $parseError');
-          rethrow;
+        final parsed = <Result>[];
+        for (final x in rawList) {
+          if (x is Map<String, dynamic>) {
+            try {
+              parsed.add(Result.fromMap(x));
+            } catch (parseError) {
+              debugPrint('[FLUTTER RESULTS REPO ERROR] Item parsing exception: $parseError | Item: $x');
+            }
+          }
         }
+        debugPrint('[PARSED JSON COUNT]: ${parsed.length}');
+        return parsed;
       }
       return [];
     } on DioException catch (e) {

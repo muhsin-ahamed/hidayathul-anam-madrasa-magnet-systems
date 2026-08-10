@@ -697,27 +697,27 @@ class Result {
     final examMap = map['exams'] is Map<String, dynamic> ? map['exams'] as Map<String, dynamic> : (map['exam'] is Map<String, dynamic> ? map['exam'] as Map<String, dynamic> : null);
 
     return Result(
-      id: map['id'] as String,
-      examId: (map['exam_id'] ?? map['examId']) as String? ?? '',
-      studentId: (map['student_id'] ?? map['studentId']) as String? ?? '',
-      subjectId: (map['subject_id'] ?? map['subjectId']) as String? ?? '',
+      id: (map['id'] ?? map['_id'])?.toString() ?? '',
+      examId: (map['exam_id'] ?? map['examId'])?.toString() ?? '',
+      studentId: (map['student_id'] ?? map['studentId'])?.toString() ?? '',
+      subjectId: (map['subject_id'] ?? map['subjectId'])?.toString() ?? '',
       marksObtained: (map['marks_obtained'] ?? map['marksObtained']) != null
           ? parseDouble(map['marks_obtained'] ?? map['marksObtained'])
           : null,
       maximumMarks: parseDouble(map['maximum_marks'] ?? map['maximumMarks']),
-      grade: map['grade'] as String?,
-      resultStatus: (map['result_status'] ?? map['resultStatus']) as String?,
-      remarks: map['remarks'] as String?,
-      isPublished: (map['is_published'] ?? map['isPublished']) as bool? ?? false,
+      grade: map['grade']?.toString(),
+      resultStatus: (map['result_status'] ?? map['resultStatus'])?.toString(),
+      remarks: map['remarks']?.toString(),
+      isPublished: map['is_published'] == true || map['isPublished'] == true,
       publishedAt: parseDateTime(map['published_at'] ?? map['publishedAt']),
-      createdBy: (map['created_by'] ?? map['createdBy']) as String?,
+      createdBy: (map['created_by'] ?? map['createdBy'])?.toString(),
       createdAt: parseDateTime(map['created_at'] ?? map['createdAt']) ?? DateTime.now(),
       updatedAt: parseDateTime(map['updated_at'] ?? map['updatedAt']) ?? DateTime.now(),
-      studentName: studentMap?['full_name'] as String?,
-      rollNumber: studentMap?['roll_number'] as String?,
-      subjectName: subjectMap?['subject_name'] as String?,
-      subjectCode: subjectMap?['subject_code'] as String?,
-      examName: examMap?['exam_name'] as String?,
+      studentName: studentMap?['full_name']?.toString() ?? map['studentName']?.toString(),
+      rollNumber: studentMap?['roll_number']?.toString() ?? map['rollNumber']?.toString(),
+      subjectName: subjectMap?['subject_name']?.toString() ?? map['subjectName']?.toString(),
+      subjectCode: subjectMap?['subject_code']?.toString() ?? map['subjectCode']?.toString(),
+      examName: examMap?['exam_name']?.toString() ?? map['examName']?.toString(),
     );
   }
 
