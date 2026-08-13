@@ -1063,145 +1063,211 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
                   ),
                 )
               else
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final minTableWidth = math.max(constraints.maxWidth, 700.0);
-                    final dynamicColumnSpacing = constraints.maxWidth > 700
-                        ? math.max(24.0, 24.0 + (constraints.maxWidth - 700) / 5)
-                        : 24.0;
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minWidth: minTableWidth),
-                        child: DataTable(
-                          columnSpacing: dynamicColumnSpacing,
-                          columns: const [
-                            DataColumn(label: Text('Student')),
-                            DataColumn(label: Text('Subject')),
-                            DataColumn(label: Text('Exam')),
-                            DataColumn(label: Text('Marks')),
-                            DataColumn(label: Text('Grade')),
-                            DataColumn(label: Text('Actions')),
-                          ],
-                          rows: [
-                            for (final res in _results)
-                              DataRow(
-                                cells: [
-                                  DataCell(
-                                    Text(
-                                      res.studentName ??
-                                          _students
-                                              .firstWhere(
-                                                (s) => s.id == res.studentId,
-                                                orElse:
-                                                    () => Student(
-                                                      id: res.studentId,
-                                                      admissionNumber: '',
-                                                      rollNumber: '',
-                                                      fullName:
-                                                          'Student (${shortId(res.studentId)})',
-                                                      classId: '',
-                                                      createdAt: DateTime.now(),
-                                                      updatedAt: DateTime.now(),
-                                                    ),
-                                              )
-                                              .fullName,
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      res.subjectName ??
-                                          _subjects
-                                              .firstWhere(
-                                                (s) => s.id == res.subjectId,
-                                                orElse:
-                                                    () => Subject(
-                                                      id: res.subjectId,
-                                                      subjectName:
-                                                          'Subject (${shortId(res.subjectId)})',
-                                                      classId: '',
-                                                      createdAt: DateTime.now(),
-                                                    ),
-                                              )
-                                              .subjectName,
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      res.examName ??
-                                          _exams
-                                              .firstWhere(
-                                                (e) => e.id == res.examId,
-                                                orElse:
-                                                    () => Exam(
-                                                      id: res.examId,
-                                                      examName:
-                                                          'Exam (${shortId(res.examId)})',
-                                                      classId: '',
-                                                      createdAt: DateTime.now(),
-                                                      updatedAt: DateTime.now(),
-                                                    ),
-                                              )
-                                              .examName,
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      '${res.marksObtained ?? 0} / ${res.maximumMarks.toInt()}',
-                                    ),
-                                  ),
-                                  DataCell(
-                                    StatusBadge(
-                                      label: res.grade ?? 'F',
-                                      color:
-                                          (res.grade == 'A+' ||
-                                                  res.grade == 'A' ||
-                                                  res.grade == 'B+' ||
-                                                  res.grade == 'B')
-                                              ? const Color(0xFF059669)
-                                              : (res.grade == 'F'
-                                                  ? const Color(0xFFDC2626)
-                                                  : const Color(0xFFD97706)),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.edit_outlined,
-                                            size: 18,
-                                          ),
-                                          onPressed:
-                                              () => _showUploadResultDialog(
-                                                resultToEdit: res,
-                                              ),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete_outline,
-                                            size: 18,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () => _deleteResult(res),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                _buildMatrixUploadedResultsTable(
+                  borderColor: borderColor,
+                  isDark: isDark,
                 ),
             ],
           ),
         ),
 
       ],
+    );
+  }
+
+  void _deleteStudentResults(_StudentMatrixRow row) async {
+    final resultRepo = context.read<ResultRepository>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Student Results'),
+        content: Text('Are you sure you want to delete all examination results for ${row.student.fullName}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete All'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() => _isLoading = true);
+      try {
+        for (final r in row.resultsList) {
+          await resultRepo.deleteResult(r.id);
+        }
+        if (!mounted) return;
+        await _refreshResults();
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting results: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Widget _buildMatrixUploadedResultsTable({
+    required Color borderColor,
+    required bool isDark,
+  }) {
+    if (_results.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 32),
+        child: Center(
+          child: Text(
+            'No examination results recorded yet.',
+            style: TextStyle(color: Color(0xFF45464D)),
+          ),
+        ),
+      );
+    }
+
+    final Map<String, List<Result>> studentResultsMap = {};
+    for (final r in _results) {
+      studentResultsMap.putIfAbsent(r.studentId, () => []).add(r);
+    }
+
+    final List<String> subjectNames = [];
+    for (final s in _subjects) {
+      if (!subjectNames.contains(s.subjectName)) subjectNames.add(s.subjectName);
+    }
+    for (final r in _results) {
+      if (r.subjectName != null && r.subjectName!.isNotEmpty && !subjectNames.contains(r.subjectName)) {
+        subjectNames.add(r.subjectName!);
+      }
+    }
+
+    final List<_StudentMatrixRow> matrixRows = [];
+
+    for (final entry in studentResultsMap.entries) {
+      final sId = entry.key;
+      final resList = entry.value;
+
+      final firstRes = resList.first;
+      final studentObj = _students.firstWhere(
+        (s) => s.id == sId,
+        orElse: () => Student(
+          id: sId,
+          admissionNumber: firstRes.studentName != null ? shortId(sId) : '',
+          rollNumber: '',
+          fullName: firstRes.studentName ?? 'Student (${shortId(sId)})',
+          classId: '',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      double totalObtained = 0;
+      double totalMax = 0;
+      bool hasFailedSubject = false;
+
+      final Map<String, Result> subMap = {};
+      for (final r in resList) {
+        final name = r.subjectName ?? _subjects.firstWhere((s) => s.id == r.subjectId, orElse: () => Subject(id: r.subjectId, subjectName: 'Sub', classId: '', createdAt: DateTime.now())).subjectName;
+        subMap[name] = r;
+        final m = r.marksObtained ?? 0;
+        totalObtained += m;
+        totalMax += (r.maximumMarks > 0 ? r.maximumMarks : 50);
+
+        if (m < 18 || r.grade == 'F') {
+          hasFailedSubject = true;
+        }
+      }
+
+      final String overallGrade = hasFailedSubject ? 'FAILED' : 'PASSED';
+
+      matrixRows.add(_StudentMatrixRow(
+        student: studentObj,
+        subjectMarksMap: subMap,
+        totalObtained: totalObtained,
+        totalMax: totalMax,
+        grade: overallGrade,
+        resultsList: resList,
+      ));
+    }
+
+    matrixRows.sort((a, b) => b.totalObtained.compareTo(a.totalObtained));
+    for (int i = 0; i < matrixRows.length; i++) {
+      matrixRows[i].rank = i + 1;
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        border: TableBorder.all(color: borderColor.withValues(alpha: 0.5), width: 1),
+        headingRowColor: WidgetStateProperty.all(isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+        columns: [
+          const DataColumn(label: Text('ADMISSION NO`', style: TextStyle(fontWeight: FontWeight.bold))),
+          const DataColumn(label: Text('STUDENT NAME', style: TextStyle(fontWeight: FontWeight.bold))),
+          for (final subName in subjectNames)
+            DataColumn(label: Text(subName.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold))),
+          const DataColumn(label: Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold))),
+          const DataColumn(label: Text('Grade', style: TextStyle(fontWeight: FontWeight.bold))),
+          const DataColumn(label: Text('STATUS (rank)', style: TextStyle(fontWeight: FontWeight.bold))),
+          const DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold))),
+        ],
+        rows: matrixRows.map((row) {
+          return DataRow(
+            cells: [
+              DataCell(Text(row.student.admissionNumber.isNotEmpty ? row.student.admissionNumber : shortId(row.student.id))),
+              DataCell(Text(row.student.fullName, style: const TextStyle(fontWeight: FontWeight.w600))),
+              for (final subName in subjectNames)
+                DataCell(
+                  Center(
+                    child: Text(
+                      row.subjectMarksMap.containsKey(subName) && row.subjectMarksMap[subName]?.marksObtained != null
+                          ? '${row.subjectMarksMap[subName]!.marksObtained!.toInt()}'
+                          : '-',
+                      style: TextStyle(
+                        color: (row.subjectMarksMap[subName]?.marksObtained ?? 0) < 18 ? Colors.red : null,
+                        fontWeight: (row.subjectMarksMap[subName]?.marksObtained ?? 0) < 18 ? FontWeight.bold : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              DataCell(Text('${row.totalObtained.toInt()}', style: const TextStyle(fontWeight: FontWeight.bold))),
+              DataCell(
+                StatusBadge(
+                  label: row.grade,
+                  color: row.grade == 'PASSED'
+                      ? const Color(0xFF059669)
+                      : const Color(0xFFDC2626),
+                ),
+              ),
+              DataCell(
+                Center(
+                  child: Text(
+                    '${row.rank}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+              ),
+              DataCell(
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      tooltip: 'Edit Marks',
+                      onPressed: () => _showUploadResultDialog(resultToEdit: row.resultsList.first),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                      tooltip: 'Delete Student Results',
+                      onPressed: () => _deleteStudentResults(row),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -1901,6 +1967,26 @@ class _UploadResultDialogState extends State<_UploadResultDialog> {
       ],
     );
   }
+}
+
+class _StudentMatrixRow {
+  final Student student;
+  final Map<String, Result> subjectMarksMap;
+  final double totalObtained;
+  final double totalMax;
+  final String grade;
+  final List<Result> resultsList;
+  int rank;
+
+  _StudentMatrixRow({
+    required this.student,
+    required this.subjectMarksMap,
+    required this.totalObtained,
+    required this.totalMax,
+    required this.grade,
+    required this.resultsList,
+    this.rank = 0,
+  });
 }
 
 
