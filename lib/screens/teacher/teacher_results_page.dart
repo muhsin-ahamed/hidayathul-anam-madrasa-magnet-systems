@@ -1133,12 +1133,13 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
     }
 
     final List<String> subjectNames = [];
-    for (final s in _subjects) {
-      if (!subjectNames.contains(s.subjectName)) subjectNames.add(s.subjectName);
-    }
     for (final r in _results) {
-      if (r.subjectName != null && r.subjectName!.isNotEmpty && !subjectNames.contains(r.subjectName)) {
-        subjectNames.add(r.subjectName!);
+      final name = r.subjectName ?? _subjects.firstWhere(
+        (s) => s.id == r.subjectId,
+        orElse: () => Subject(id: r.subjectId, subjectName: '', classId: '', createdAt: DateTime.now()),
+      ).subjectName;
+      if (name.isNotEmpty && !subjectNames.contains(name)) {
+        subjectNames.add(name);
       }
     }
 
