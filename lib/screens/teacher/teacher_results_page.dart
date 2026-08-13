@@ -1175,7 +1175,7 @@ class _TeacherResultsPageState extends State<TeacherResultsPage> {
         totalObtained += m;
         totalMax += (r.maximumMarks > 0 ? r.maximumMarks : 50);
 
-        if (m < 18 || r.grade == 'F') {
+        if (m < 18) {
           hasFailedSubject = true;
         }
       }
