@@ -331,6 +331,13 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
       });
     }
 
+    if (exam && !exam.results_published) {
+      await prisma.exams.update({
+        where: { id: exam.id },
+        data: { results_published: true }
+      }).catch(() => null);
+    }
+
     if (!exam) {
       errors.push(`Row ${rowNum}: Could not find or create exam for student '${admissionNum}'`);
       continue;

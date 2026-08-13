@@ -204,10 +204,8 @@ class _ResultPageState extends State<ResultPage> {
                                   DataCell(Text(record.grade ?? 'N/A')),
                                   DataCell(
                                     StatusBadge(
-                                      label: record.resultStatus ?? 'N/A',
-                                      color:
-                                          (record.resultStatus?.toLowerCase() ==
-                                              'pass')
+                                      label: (record.marksObtained ?? 0) >= 18 ? 'Pass' : 'Fail',
+                                      color: (record.marksObtained ?? 0) >= 18
                                           ? const Color(0xFF059669)
                                           : const Color(0xFFDC2626),
                                     ),
