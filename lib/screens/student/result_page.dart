@@ -34,7 +34,7 @@ class _ResultPageState extends State<ResultPage> {
       final resultsRepo = context.read<ResultRepository>();
       final res = await resultsRepo.getResultsByStudent(student.id);
 
-      final published = res.where((r) => r.isPublished).toList();
+      final published = res;
 
       final Map<String, List<Result>> grouped = {};
       for (final r in published) {
