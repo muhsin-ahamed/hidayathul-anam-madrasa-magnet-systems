@@ -362,23 +362,49 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
       continue;
     }
 
+    const SUBJECT_ARABIC_MAP: Record<string, string> = {
+      'THAREEQ': 'تاريخ',
+      'THAREEEQ': 'تاريخ',
+      'TARIKH': 'تاريخ',
+      'LISANUL QURAN': 'لسان القرآن',
+      'LISANULQURAN': 'لسان القرآن',
+      'LISAN': 'لسان القرآن',
+      'DUROOSUL IHSAN': 'دروس الإحسان',
+      'DUROOSULIHSAN': 'دروس الإحسان',
+      'IHSAN': 'دروس الإحسان',
+      'FIQH': 'فقه',
+      'AKHLAQ': 'أخلاق',
+      'TAJWEED': 'تجويد',
+      'AQEEDA': 'عقيدة',
+      'TAWHEED': 'توحيد',
+      'THAWHEED': 'توحيد',
+    };
+
     for (const subEntry of subjectEntries) {
       const subjectInput = subEntry.name;
+      const normInput = subjectInput.trim().toUpperCase().replace(/[`'\s_()0-9]/g, '');
+      const mappedArabic = SUBJECT_ARABIC_MAP[normInput] || SUBJECT_ARABIC_MAP[subjectInput.trim().toUpperCase()];
+
       let subject = await prisma.subjects.findFirst({
         where: {
           OR: [
             ...(isUuid(subjectInput) ? [{ id: subjectInput }] : []),
-            { subject_name: { equals: subjectInput, mode: 'insensitive' } },
-            { subject_code: { equals: subjectInput, mode: 'insensitive' } },
+            { subject_name: { equals: subjectInput, mode: 'insensitive' as const } },
+            { subject_code: { equals: subjectInput, mode: 'insensitive' as const } },
+            ...(mappedArabic ? [
+              { subject_name: { equals: mappedArabic, mode: 'insensitive' as const } },
+              { subject_code: { equals: mappedArabic, mode: 'insensitive' as const } }
+            ] : []),
           ]
         }
       });
 
       if (!subject && student.class_id) {
+        const finalSubName = mappedArabic || subjectInput;
         subject = await prisma.subjects.create({
           data: {
             class_id: student.class_id,
-            subject_name: subjectInput,
+            subject_name: finalSubName,
             subject_code: subjectInput.substring(0, 10).toUpperCase(),
           }
         });
@@ -390,7 +416,7 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
       }
 
       const marksObtained = Number(subEntry.marks);
-      const maximumMarks = Number(row['Total Marks'] ?? row['maximum_marks'] ?? row['TotalMarks'] ?? 100) || 100;
+      const maximumMarks = Number(row['Total Marks'] ?? row['maximum_marks'] ?? row['TotalMarks'] ?? 50) || 50;
 
       if (isNaN(marksObtained)) {
         errors.push(`Row ${rowNum}: Invalid marks '${subEntry.marks}' for subject '${subjectInput}'`);
@@ -399,14 +425,17 @@ export const importResults = async (fileBuffer: Buffer | undefined, body: any, u
 
       let grade = row['Grade'] ?? row['grade'];
       if (!grade) {
-        const pct = (marksObtained / maximumMarks) * 100;
-        if (pct >= 90) grade = 'A+';
-        else if (pct >= 80) grade = 'A';
-        else if (pct >= 70) grade = 'B+';
-        else if (pct >= 60) grade = 'B';
-        else if (pct >= 50) grade = 'C';
-        else if (pct >= 40) grade = 'D';
-        else grade = 'F';
+        if (marksObtained < 18) {
+          grade = 'F';
+        } else {
+          const pct = (marksObtained / maximumMarks) * 100;
+          if (pct >= 90) grade = 'A+';
+          else if (pct >= 80) grade = 'A';
+          else if (pct >= 70) grade = 'B+';
+          else if (pct >= 60) grade = 'B';
+          else if (pct >= 50) grade = 'C';
+          else grade = 'D';
+        }
       }
 
       validItems.push({
