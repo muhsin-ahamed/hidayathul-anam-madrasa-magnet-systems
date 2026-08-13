@@ -99,6 +99,18 @@ class _ResultPageState extends State<ResultPage> {
       );
     }
 
+    String calculateAccurateGrade(double marks, double maxMarks) {
+      final effectiveMax = (maxMarks > 0 && maxMarks <= 50) ? maxMarks : 50.0;
+      if (marks < 18) return 'F';
+      final pct = (marks / effectiveMax) * 100;
+      if (pct >= 90) return 'A+';
+      if (pct >= 80) return 'A';
+      if (pct >= 70) return 'B+';
+      if (pct >= 60) return 'B';
+      if (pct >= 50) return 'C';
+      return 'D';
+    }
+
     final currentExamRecords = _selectedExam != null
         ? (_groupedResults[_selectedExam] ?? [])
         : <Result>[];
@@ -108,7 +120,7 @@ class _ResultPageState extends State<ResultPage> {
     for (final r in currentExamRecords) {
       if (r.marksObtained != null) {
         totalObtained += r.marksObtained!;
-        totalMax += r.maximumMarks;
+        totalMax += (r.maximumMarks > 0 && r.maximumMarks <= 50 ? r.maximumMarks : 50.0);
       }
     }
     if (totalMax > 0) {
@@ -198,10 +210,18 @@ class _ResultPageState extends State<ResultPage> {
                                   ),
                                   DataCell(
                                     Text(
-                                      '${record.marksObtained ?? 0} / ${record.maximumMarks}',
+                                      '${record.marksObtained?.toInt() ?? 0} / ${(record.maximumMarks > 0 && record.maximumMarks <= 50) ? record.maximumMarks.toInt() : 50}',
                                     ),
                                   ),
-                                  DataCell(Text(record.grade ?? 'N/A')),
+                                  DataCell(
+                                    Text(
+                                      calculateAccurateGrade(
+                                        record.marksObtained ?? 0,
+                                        record.maximumMarks,
+                                      ),
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                   DataCell(
                                     StatusBadge(
                                       label: (record.marksObtained ?? 0) >= 18 ? 'Pass' : 'Fail',
